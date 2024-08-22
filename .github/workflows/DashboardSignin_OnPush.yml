@@ -4,7 +4,10 @@ on:
   push:
     branches:
       - main
-
+# on:
+#   schedule:
+#     - cron: "30 12,19, 00 * * *"  # 7:30 PM, 02:30 AM, 07:30 AM
+    
 jobs:
   clone-git-then-build-test:
     runs-on: ubuntu-20.04
@@ -94,7 +97,7 @@ jobs:
         with:
           name: MP4 Files
           path: |
-            GoSELL-Automation**/*.mp4
+            GoSELL-Automation/**/*.mp4
 
       - name: Upload Test Report
         if: always()

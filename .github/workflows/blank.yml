@@ -1,0 +1,135 @@
+name: Clone, Configure, and Test
+
+# on:
+#   push:
+#     branches:
+#       - main
+on:
+ schedule:
+   - cron: "00 2,13 * * *"  # 9:30 AM, 4:30 PM
+
+jobs:
+  clone-git:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout the current repository
+        uses: actions/checkout@v2
+
+      - name: Install OpenVPN
+        run: |
+          sudo apt update -y
+          sudo apt install -y openvpn
+
+      - name: Create VPN Credentials File
+        run: |
+          echo "${{ secrets.VPN_USERNAME }}" > ${{ secrets.VPN_AUTHOR }}
+          echo "${{ secrets.VPN_PASSWORD }}" >> ${{ secrets.VPN_AUTHOR }}
+          chmod 600 ${{ secrets.VPN_AUTHOR }}
+
+      - name: Start OpenVPN
+        run: |
+          for i in {1..5}; do
+            sudo nohup openvpn --verb 4 --config $(pwd)/${{ secrets.VPN_OVPN }} --auth-user-pass $(pwd)/${{ secrets.VPN_AUTHOR }} > $HOME/openvpn.log 2>&1 &
+            echo "$(curl -Is ${{ secrets.KIBANA }} | head -1)"
+            cat $HOME/openvpn.log
+            if grep -q "Initialization Sequence Completed" $HOME/openvpn.log; then
+              echo "OpenVPN started successfully."
+              break
+            fi
+            echo "OpenVPN start failed, retrying..."
+            sudo pkill -f openvpn
+          done
+
+      - name: Clone GitLab repository
+        run: git clone ${{ secrets.GITLAB_REPOSITORY }} GoSELL-Automation
+
+      - name: Stop OpenVPN
+        run: |
+          sudo pkill -f openvpn
+
+      - name: Save cloned repo as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: GoSELL-Automation
+          path: GoSELL-Automation
+
+      - name: Remove cloned repo
+        run: rmdir GoSELL-Automation
+
+  build-and-test:
+    needs: clone-git
+    runs-on: macos-14
+
+    steps:
+      - name: Download Git-Automation artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: GoSELL-Automation
+          path: GoSELL-Automation
+
+      - name: Create a empty folder
+        run: mkdir nothing-in-here
+
+      - name: Override Git-Automation artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: GoSELL-Automation
+          path: nothing-in-here
+
+      - name: Switch to main
+        run: |
+          cd GoSELL-Automation
+          git checkout main
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '22'
+          distribution: 'adopt'
+
+      - name: Install FFmpeg
+        run: brew install ffmpeg
+
+      - name: Verify FFmpeg Installation
+        run: ffmpeg -version
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Install dependencies
+        run: |
+          cd GoSELL-Automation
+          mvn install -DskipTests
+
+      - name: Run tests
+        run: |
+          cd GoSELL-Automation
+          mvn --batch-mode test "-DsuiteFile=test_config/web/createProductTest.xml"
+
+      - name: Upload all recording .mp4 files
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: MP4 Files
+          path: '**/*.mp4'
+
+      - name: Upload Test Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Test Reports
+          path: |
+            **/html/index.html
+            **/reportng.css
+            **/reportng.js
+            **/suite*_test*_results.html
+
+      - name: Remove cloned repo
+        run: |
+          rmdir GoSELL-Automation

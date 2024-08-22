@@ -86,14 +86,16 @@ jobs:
       - name: Run tests
         run: |
           cd GoSELL-Automation
-          mvn --batch-mode test "-DsuiteFile=test_config/web/LoginDashboardSuite.xml"
+          mvn --batch-mode test "-DsuiteFile=test_config/web/LoginDashboardBiz.xml"
 
       - name: Upload all recording .mp4 files
         if: always()
         uses: actions/upload-artifact@v3
         with:
           name: MP4 Files
-          path: '**/*.mp4'
+          path: |
+            ls **/*.mp4
+            '**/*.mp4'
 
       - name: Upload Test Report
         if: always()

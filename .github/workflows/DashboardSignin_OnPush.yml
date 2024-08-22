@@ -48,11 +48,6 @@ jobs:
         run: |
           sudo pkill -f openvpn
 
-      - name: Measure Speed After Stop VPN
-        run: |
-          speedtest-cli --json > $HOME/speedtest_after_stop_vpn.json
-          cat $HOME/speedtest_after_stop_vpn.json
-
       - name: Switch to another branch
         run: |
           cd GoSELL-Automation

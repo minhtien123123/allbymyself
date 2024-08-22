@@ -92,8 +92,6 @@ jobs:
         run: |
           pwd
           ls **/*.mp4
-          cd GoSELL-Automation
-          ls **/*.mp4
           
       - name: Upload all recording .mp4 files
         if: always()
@@ -101,7 +99,7 @@ jobs:
         with:
           name: MP4 Files
           path: |
-            '**/*.mp4'
+            **/*.mp4
 
       - name: Upload Test Report
         if: always()

@@ -13,16 +13,6 @@ jobs:
       - name: Checkout the current repository
         uses: actions/checkout@v2
 
-      - name: Install Speedtest
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y openvpn speedtest-cli
-
-      - name: Measure Speed Before VPN
-        run: |
-          speedtest-cli --json > $HOME/speedtest_before_start_vpn.json
-          cat $HOME/speedtest_before_start_vpn.json
-
       - name: Install OpenVPN
         run: |
           sudo apt update -y
@@ -49,12 +39,6 @@ jobs:
            echo "OpenVPN start failed, retrying..."
           done
           cat $HOME/openvpn.log
-        if: success()
-
-      - name: Measure Speed After Start VPN
-        run: |
-          speedtest-cli --json > $HOME/speedtest_after_start_vpn.json
-          cat $HOME/speedtest_after_start_vpn.json
 
       - name: Clone GitLab repository
         run: |

@@ -90,6 +90,8 @@ jobs:
 
       - name: List mp4 files
         run: |
+          pwd
+          ls **/*.mp4
           cd GoSELL-Automation
           ls **/*.mp4
           
@@ -111,7 +113,7 @@ jobs:
             **/reportng.css
             **/reportng.js
             **/suite*_test*_results.html
-            ./target/ExtentReport.html
+            **/ExtentReport.html
 
       - name: Remove cloned repo
         run: |

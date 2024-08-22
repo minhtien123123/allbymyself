@@ -1,12 +1,9 @@
-name: Clone, Configure, and Test
+name: '[DASHBOARD] Products >> Create'
 
 on:
   push:
     branches:
       - main
-# on:
-#  schedule:
-#    - cron: "00 2,13 * * *"  # 9:30 AM, 4:30 PM
 
 jobs:
   clone-git:
@@ -33,7 +30,7 @@ jobs:
             sudo nohup openvpn --verb 4 --config $(pwd)/${{ secrets.VPN_OVPN }} --auth-user-pass $(pwd)/${{ secrets.VPN_AUTHOR }} > $HOME/openvpn.log 2>&1 &
             echo "$(curl -Is ${{ secrets.KIBANA }} | head -1)"
             cat $HOME/openvpn.log
-            if grep -q "Initialization Sequence Completed" $HOME/openvpn.log; then
+            if grep -q "Initialization Sequence Completed" $HOME/openvpn.log || grep -q "Peer Connection Initiated with" $HOME/openvpn.log; then
               echo "OpenVPN started successfully."
               break
             fi
@@ -55,7 +52,7 @@ jobs:
           path: GoSELL-Automation
 
       - name: Remove cloned repo
-        run: rmdir GoSELL-Automation
+        run: rm -r GoSELL-Automation
 
   build-and-test:
     needs: clone-git
@@ -132,4 +129,4 @@ jobs:
 
       - name: Remove cloned repo
         run: |
-          rmdir GoSELL-Automation
+          rm -r GoSELL-Automation

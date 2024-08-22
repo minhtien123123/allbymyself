@@ -1,12 +1,12 @@
 name: Clone, Configure, and Test
 
-# on:
-#   push:
-#     branches:
-#       - main
 on:
- schedule:
-   - cron: "00 2,13 * * *"  # 9:30 AM, 4:30 PM
+  push:
+    branches:
+      - main
+# on:
+#  schedule:
+#    - cron: "00 2,13 * * *"  # 9:30 AM, 4:30 PM
 
 jobs:
   clone-git:

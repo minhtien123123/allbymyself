@@ -41,7 +41,7 @@ jobs:
       - name: Try connect to Gitlab by VPN
         run: |
           for i in {1..5}; do
-           echo "$(curl -Is ${{ secrets.GITLAB_REPOSITORY }} | head -1)"
+           echo "$(curl -Is ${{ secrets.GITLAB_HOST }} | head -1)"
            if grep -q "Initialization Sequence Completed" $HOME/openvpn.log; then
              echo "OpenVPN started successfully."
              break

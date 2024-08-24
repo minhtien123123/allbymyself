@@ -6,7 +6,6 @@ name: 'Cashbook (scheduled)'
 #       - main
 on:
   schedule:
-    - cron: "30 12 * * *"  # 7:30 PM GMT+7
     - cron: "30 00 * * *"  # 7:30 AM GMT+7
     
 jobs:

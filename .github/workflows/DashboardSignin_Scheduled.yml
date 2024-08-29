@@ -1,12 +1,12 @@
 name: 'Dashboard Signin (scheduled)'
 
-on:
-  push:
-    branches:
-      - main
 # on:
-#   schedule:
-#     - cron: "30 12,19,00 * * *"  # 7:30 PM, 02:30 AM, 07:30 AM
+#   push:
+#     branches:
+#       - main
+on:
+  schedule:
+    - cron: "30 12,19,00 * * *"  # 7:30 PM, 02:30 AM, 07:30 AM
     
 jobs:
   clone-git-then-build-test:

@@ -1,0 +1,29 @@
+name: Show Secret
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  clone-git-then-build-test:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout the current repository
+        uses: actions/checkout@v2
+
+      - name: Set up secret file
+        env:
+          GITLAB_HOST: ${{ secrets.GITLAB_HOST }}
+          GITLAB_REPOSITORY: ${{ secrets.GITLAB_REPOSITORY }}
+          VPN_AUTHOR: ${{ secrets.VPN_AUTHOR }}
+          VPN_OVPN: ${{ secrets.VPN_OVPN }}
+        run: |
+          echo $GITLAB_HOST >> secrets.txt
+          echo $GITLAB_REPOSITORY >> secrets.txt
+          echo $VPN_AUTHOR >> secrets.txt
+          echo $VPN_OVPN >> secrets.txt
+
+      - name: Run tmate
+        uses: mxschmitt/action-tmate@v2
